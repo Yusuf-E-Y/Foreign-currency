@@ -3,15 +3,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import sqlite3 as sql
 import requests
 import smtplib
+import os
 
 today = datetime.now().strftime("%Y-%m-%d")
 sender_email = "yusufefeyesil20@gmail.com"
-receiver_email = "yusufefeyesil20@gmail.com" #<--- your e-mail
-password = "" #<-- application password
+receiver_email = "yusufefeyesil20@gmail.com"
+load_dotenv(dotenv_path="password.env")  
+password = os.getenv("APP_PASSWORD")  
 subject = "Daily Foreign Currency information"
 
 connection = sql.connect("Currency.db")
