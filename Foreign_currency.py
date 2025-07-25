@@ -10,8 +10,8 @@ import smtplib
 
 today = datetime.now().strftime("%Y-%m-%d")
 sender_email = "yusufefeyesil20@gmail.com"
-receiver_email = "yusufefeyesil20@gmail.com"
-password = "vsws dqjs lnqp xhbl"
+receiver_email = "yusufefeyesil20@gmail.com" #<--- your e-mail
+password = "" #<-- application password
 subject = "Daily Foreign Currency information"
 
 connection = sql.connect("Currency.db")
