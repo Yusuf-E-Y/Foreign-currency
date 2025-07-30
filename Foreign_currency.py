@@ -11,9 +11,9 @@ import smtplib
 import os
 
 today = datetime.now().strftime("%Y-%m-%d")
-sender_email = "yusufefeyesil20@gmail.com"
-receiver_email = "yusufefeyesil20@gmail.com"
 load_dotenv(dotenv_path="password.env")  
+sender_email = os.getenv("EMAİL")
+receiver_email = os.getenv("EMAİL")
 password = os.getenv("APP_PASSWORD")  
 subject = "Daily Foreign Currency information"
 
