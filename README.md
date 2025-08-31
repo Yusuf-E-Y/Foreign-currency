@@ -17,3 +17,5 @@ pip install matplotlib
 if want run the all of time this code must be deployement heroku or pythonanywhere (may not work)
 
 ![USD Graph](Graphs/graph_usd.png)
+![Eur Graph](Graphs/graph_eur.png)
+![Chf Graph](Graphs/graph_chf.png)
