@@ -3,15 +3,19 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from dotenv import load_dotenv
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import sqlite3 as sql
 import requests
 import smtplib
+import os
 
 today = datetime.now().strftime("%Y-%m-%d")
-sender_email = "yusufefeyesil20@gmail.com"
-receiver_email = "yusufefeyesil20@gmail.com"
-password = "vsws dqjs lnqp xhbl"
+load_dotenv(dotenv_path="password.env")  
+sender_email = os.getenv("EMAİL")
+receiver_email = os.getenv("EMAİL")
+password = os.getenv("APP_PASSWORD")  
 subject = "Daily Foreign Currency information"
 
 connection = sql.connect("Currency.db")
@@ -123,9 +127,13 @@ def send_mail():
 
 cursor.execute("SELECT date, sale FROM static WHERE currency='USD' ORDER BY date")
 datas_usd = cursor.fetchall()
+cursor.execute("SELECT sale FROM static WHERE currency='USD' ORDER BY date")
+api_usd = cursor.fetchall()
 
 cursor.execute("SELECT date, sale FROM static WHERE currency='EUR' ORDER BY date")
 datas_eur = cursor.fetchall()
+cursor.execute("SELECT sale FROM static WHERE currency='EUR' ORDER BY date")
+api_eur = cursor.fetchall()
 
 cursor.execute("SELECT date, sale FROM static WHERE currency='CHF' ORDER BY date")
 datas_chf = cursor.fetchall()
@@ -139,21 +147,34 @@ sales_eur = [row[1] for row in datas_eur]
 dates_chf = [row[0] for row in datas_chf]
 sales_chf = [row[1] for row in datas_chf]
 
-def Create_graph(date,value,file_name,g_name):
-    plt.figure(figsize=(10,5))
+def Create_graph(date, value, g_name):
+    import io, base64
+    import matplotlib
+    matplotlib.use("Agg")
+    date = [datetime.strptime(d, "%Y-%m-%d") if isinstance(d, str) else d for d in date]
+
+    plt.figure(figsize=(12,6))
     plt.plot(date, value, marker="o", linestyle="-", color="blue", label=g_name)
     plt.xlabel("Date")
     plt.ylabel("Sale price (₺)")
     plt.title(g_name)
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))
     plt.xticks(rotation=45)
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(file_name)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
     plt.close()
+    buf.seek(0)
+
+    img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return img_base64
 
 loop()
-Create_graph(dates_usd,sales_usd,"graph_usd.png","USD sale price")
-Create_graph(dates_eur, sales_eur,"graph_eur.png","EUR Sale price")
-Create_graph(dates_chf, sales_chf,"graph_chf.png","CHF Sale price")
+Create_graph(dates_usd, sales_usd,"USD sale price")
+Create_graph(dates_eur, sales_eur,"EUR Sale price")
+Create_graph(dates_chf, sales_chf,"CHF Sale price")
 send_mail()
